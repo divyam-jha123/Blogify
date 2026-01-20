@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blogify</title>
+
+    <%- include('./partials/head') %>
+  </head>
+  <body>
+    <%- include('./partials/nav') %>
+
+    <div class="container mt-5">
+      <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+          <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+              <h4 class="mb-4 text-center">Create New Post</h4>
+
+              <form action="/blog" method="post">
+                <!-- conver image -->
+
+                <div class="mb-3">
+                  <label for="cover-image" class="form-label">Cover Image</label>
+                  <input
+                  name="converImageUrl"
+                    type="file"
+                    class="form-control"
+                    name="title"
+                    id="cover-image"
+                    placeholder="add image..."
+                    required
+                  />
+                </div>
+                
+                <!-- Title -->
+                <div class="mb-3">
+                  <label for="title" class="form-label">Title</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    name="title"
+                    id="title"
+                    placeholder="Enter post title"
+                    required
+                  />
+                </div>
+
+                <!-- Content -->
+                <div class="form-floating mb-3">
+                  <textarea
+                    name="content"
+                    class="form-control"
+                    placeholder="Write your post..."
+                    id="floatingTextarea2"
+                    style="height: 120px"
+                    required
+                  ></textarea>
+                  <label name ="body" for="floatingTextarea2">Write content...</label>
+                </div>
+
+                <!-- Button -->
+                <div class="d-grid">
+                  <button type="submit" class="btn btn-primary">
+                    Add Post
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <%- include('./partials/script') %>
+  </body>
+</html>

@@ -10,6 +10,7 @@ const connectDb = require('./db/connection');
 const port = process.env.PORT;
 
 const userRoute = require('./routes/user');
+const blogsRoute = require('./routes/blog');
 
 
 app.use(express.urlencoded({ extended: false }));
@@ -30,7 +31,9 @@ app.get('/', (req, res) => {
     });
 });
 
-app.use('/user', userRoute);
+app.use('/user', userRoute)
+app.use('/blog', blogsRoute);
+
 
 
 const start = async () => {
