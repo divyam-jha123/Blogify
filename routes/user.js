@@ -34,7 +34,7 @@ router.post('/signup', async (req, res) => {
             userName,
             email,
             password,
-        })
+        });
 
         return res.redirect('/user/login');
 
