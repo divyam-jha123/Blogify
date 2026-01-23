@@ -18,8 +18,8 @@
           <% blogs.forEach(blog=> { %>
             <div class="col-md-4 mb-4">
               <div class="card h-100">
-                <% if (blog.converImageUrl) { %>
-                  <img src="<%= blog.converImageUrl %>" class="card-img-top" alt="<%= blog.title %>"
+                <% if (blog.coverImageUrl) { %>
+                  <img src="<%= blog.coverImageUrl %>" class="card-img-top" alt="<%= blog.title %>"
                     style="height: 180px; object-fit: cover;">
                   <% } else { %>
                     <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center"
