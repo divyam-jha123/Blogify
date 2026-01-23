@@ -84,7 +84,7 @@ router.post('/login', async (req, res) => {
 
     } catch (error) {
         return res.render('login', {
-            error: 'Invalid email or password',
+            error: 'Invalid email or password,signup',
         })
     }
 });

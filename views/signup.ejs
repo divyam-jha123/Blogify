@@ -1,47 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>home</title>
 
-    <%- include('./partials/head') %>
-  </head>
-  <body>
-    <body class="bg-light">
-  <div class="container min-vh-100 d-flex justify-content-center align-items-center">
-    <div class="card shadow p-4" style="width: 100%; max-width: 420px;">
-      <h4 class="text-center mb-4">Create Account</h4>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>home</title>
 
-      <form action="/user/signup" method="post">
-        <div class="mb-3">
-          <label class="form-label">User Name</label>
-          <input type="text" name="userName" class="form-control" placeholder="Enter username" />
-        </div>
+  <%- include('./partials/head') %>
+</head>
 
-        <div class="mb-3">
-          <label class="form-label">Email address</label>
-          <input type="email" name="email" class="form-control" placeholder="Enter email" />
-          
-        </div>
+<body>
 
-        <div class="mb-3">
-          <label class="form-label">Password</label>
-          <input type="password" name="password" class="form-control" placeholder="Enter password" />
-          <div class="form-text">
-            Don't share your password with anyone else.
+  <body class="bg-light">
+    <div class="container min-vh-100 d-flex justify-content-center align-items-center">
+      <div class="card shadow p-4" style="width: 100%; max-width: 420px;">
+        <h4 class="text-center mb-4">Create Account</h4>
+
+        <form action="/user/signup" method="post">
+          <div class="mb-3">
+            <label class="form-label">User Name</label>
+            <input type="text" name="userName" class="form-control" placeholder="Enter username" />
           </div>
-        </div>
 
-        <button type="submit" class="btn btn-primary w-100">
-          Submit
-        </button>
-      </form>
+          <div class="mb-3">
+            <label class="form-label">Email address</label>
+            <input type="email" name="email" class="form-control" placeholder="Enter email" />
+
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password" name="password" class="form-control" placeholder="Enter password" />
+            <div class="form-text">
+              Don't share your password with anyone else.
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">
+            Submit
+          </button>
+        </form>
+        <div class="mt-3 text-center">
+          Already have an account? <a href="/user/login">Login</a>
+        </div>
+      </div>
     </div>
-  </div>
+  </body>
+
+
+  <%- include('./partials/script') %>
 </body>
 
-
-    <%- include('./partials/script') %>
-  </body>
 </html>

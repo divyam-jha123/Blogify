@@ -24,10 +24,10 @@ app.use(checkForAuthenticationCookie("token"));
 app.set("view engine", "ejs");
 app.set("views", path.resolve('./views'));
 
-app.get('/', async (req, res) => {    
+app.get('/', async (req, res) => {
 
     if (!req.user) {
-        return res.redirect('/user/login');
+        return res.redirect('/user/signup');
     }
 
     const blogs = await Blog.find({}).sort({ createdAt: -1 });
