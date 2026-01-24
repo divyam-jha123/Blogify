@@ -165,9 +165,9 @@ router.post('/forgetPass', async (req, res) => {
 
 router.get('/profile', restrictToLoggedinUserOnly, async (req, res) => {
 
-    const blogs = await Blog.find({createdBy: req.user._id});
+    const blogs = await Blog.find({ createdBy: req.user._id });
 
-    return res.render('profile' , {
+    return res.render('profile', {
         user: req.user,
         blogs,
     });
@@ -190,13 +190,21 @@ router.post('/upload-profile-image', restrictToLoggedinUserOnly, upload.single('
 
         profileImage = uploadResult.secure_url;
 
-        const user = await User.findById(req.user._id);
-        user.profileImageURL = profileImage;
-        await user.save();
-
-        return res.json({
-            msg: 'profile image uploaded successfully',
+        const updatedUser = await User.findByIdAndUpdate(req.user._id, {
             profileImageURL: profileImage
+        },
+            { new: true });
+
+        const token = createToken(updatedUser);
+
+        return res.cookie('token', token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 30 * 60 * 60 * 1000,
+            sameSite: 'strict'
+        }).json({
+            msg: 'profile image uploaded successfully',
+            profileImageURL: updatedUser.profileImageURL
         });
 
     } catch (error) {
