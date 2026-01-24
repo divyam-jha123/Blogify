@@ -47,8 +47,12 @@
         </a>
       </li>
       <a href="/user/profile">
-        <img src="<%= user.profileImageURL ? user.profileImageURL : '/image/default.webp' %>" alt="" height="35px"
-          width="35px" style="border-radius: 50%; margin: 10px;">
+        <% if (!user) { %>
+          <img src="/image/default.webp" alt="" height="35px" width="35px" style="border-radius: 50%; margin: 10px;">
+        <% } else { %>
+          <img src="<%= user.profileImageURL ? user.profileImageURL : '/image/default.webp' %>" alt="" height="35px"
+            width="35px" style="border-radius: 50%; margin: 10px;">
+        <% } %>
       </a>
     </div>
   </div>
