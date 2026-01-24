@@ -9,6 +9,7 @@ A full-stack blogging platform built with Node.js, Express, and MongoDB. Users c
 - **Browse feed** — Homepage shows all blogs sorted by newest first
 - **View single blog** — Click a post to read the full content and see author info
 - **Image uploads** — Cover images uploaded to Cloudinary and served via CDN
+- **GitHub Integration** — Quick access to the repository via the navigation bar
 
 ## Tech Stack
 
@@ -137,3 +138,25 @@ blogging-application/
 |------------|--------------------------------|
 | `npm start` | Run the server                 |
 | `npm run dev` | Run with nodemon (auto-reload) |
+
+## Contributing
+
+Contributions are welcome! If you'd like to contribute to this project, please follow these steps:
+
+1.  **Fork the repository** to your own GitHub account.
+2.  **Clone your fork** to your local machine:
+    ```bash
+    git clone https://github.com/YOUR_USERNAME/blogging-application.git
+    ```
+3.  **Create a new branch** for your feature or bug fix:
+    ```bash
+    git checkout -b feature/your-feature-name
+    ```
+4.  **Make your changes** and commit them with descriptive messages.
+5.  **Push your changes** to your fork:
+    ```bash
+    git push origin feature/your-feature-name
+    ```
+6.  **Open a Pull Request (PR)** from your fork to the main repository.
+
+Please ensure your code follows the existing style and conventions.
