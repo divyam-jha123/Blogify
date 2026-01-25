@@ -9,6 +9,7 @@ const { verifyUser } = require('./service/authentication');
 const Blog = require('./models/blog');
 
 const connectDb = require('./db/connection');
+const { MongoMemoryServer } = require('mongodb-memory-server');
 
 const port = process.env.PORT;
 
@@ -46,7 +47,16 @@ app.use('/blog', blogsRoute);
 
 const start = async () => {
     try {
-        await connectDb(process.env.MONGO_URI);
+        let mongoUri = process.env.MONGO_URI;
+
+        if (!mongoUri) {
+            console.log("MONGO_URI not found. Starting in-memory MongoDB...");
+            const mongod = await MongoMemoryServer.create();
+            mongoUri = mongod.getUri();
+            console.log(`Using In-Memory MongoDB at: ${mongoUri}`);
+        }
+
+        await connectDb(mongoUri);
 
         app.listen(port, () => {
             console.log(`server is running at port: ${port}`);
