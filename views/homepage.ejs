@@ -35,11 +35,8 @@
                           <%= blog.body ? blog.body.substring(0, 100) + '...' : '' %>
                         </p>
                       </div>
-                      <div class="card-footer">
-                        <small class="text-muted">
-                          <%= new Date(blog.createdAt).toLocaleDateString() %>
-                        </small>
-                        <a href="/blog/<%= blog._id %>" class="btn btn-primary btn-sm float-end">Read More</a>
+                      <div class="card-footer d-flex justify-content-end align-items-center">
+                        <a href="/blog/<%= blog._id %>" class="btn btn-primary btn-sm">Read More</a>
                       </div>
               </div>
             </div>
@@ -55,6 +52,21 @@
     </div>
 
     <%- include('./partials/script') %>
+      <script>
+        function showConfirm(blogId) {
+          document.getElementById(`delete-container-${blogId}`).classList.add('d-none');
+          document.getElementById(`delete-container-${blogId}`).classList.remove('d-inline');
+          document.getElementById(`confirm-container-${blogId}`).classList.remove('d-none');
+          document.getElementById(`confirm-container-${blogId}`).classList.add('d-inline');
+        }
+
+        function hideConfirm(blogId) {
+          document.getElementById(`confirm-container-${blogId}`).classList.add('d-none');
+          document.getElementById(`confirm-container-${blogId}`).classList.remove('d-inline');
+          document.getElementById(`delete-container-${blogId}`).classList.remove('d-none');
+          document.getElementById(`delete-container-${blogId}`).classList.add('d-inline');
+        }
+      </script>
 
       <!-- Add Blog Fixed Button -->
       <style>

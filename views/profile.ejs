@@ -1,129 +1,180 @@
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile - Blogify</title>
     <%- include('./partials/head') %>
 </head>
+
 <body>
 
     <%- include('./partials/nav') %>
 
-    <div class="container mt-5 mb-5">
-        <!-- Profile Header -->
-        <div class="card mb-5 border-0">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-3 text-center mb-3 mb-md-0">
-                        <img src="<%= user.profileImageURL ? user.profileImageURL : '/image/default.webp' %>" alt="Profile Picture" class="profile-image rounded-circle" width="150" height="150" style="object-fit: cover; border: 3px solid #0d6efd; cursor: pointer;">
-                        <input type="file" name="profileImage" class="d-none" id="profile-image-input" accept="image/*">
-                        <small class="d-block text-muted mt-2">Click image to change</small>
+        <div class="container mt-5 mb-5">
+            <!-- Profile Header -->
+            <div class="card mb-5 border-0">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 text-center mb-3 mb-md-0">
+                            <img src="<%= user.profileImageURL ? user.profileImageURL : '/image/default.webp' %>"
+                                alt="Profile Picture" class="profile-image rounded-circle" width="150" height="150"
+                                style="object-fit: cover; border: 3px solid #0d6efd; cursor: pointer;">
+                            <input type="file" name="profileImage" class="d-none" id="profile-image-input"
+                                accept="image/*">
+                            <small class="d-block text-muted mt-2">Click image to change</small>
+                        </div>
+                        <div class="col-md-9">
+                            <h1 class="fw-bold mb-2">
+                                <%= user.name.toUpperCase() %>
+                            </h1>
+                            <p class="mb-2"><strong>Email:</strong> <span class="text-info">
+                                    <%= user.email %>
+                                </span></p>
+                            <small class="text-muted">Member since: <%= new Date(user.iat*1000).toLocaleDateString() %>
+                            </small>
+                        </div>
                     </div>
-                    <div class="col-md-9">
-                        <h1 class="fw-bold mb-2"><%= user.name.toUpperCase() %></h1>
-                        <p class="mb-2"><strong>Email:</strong> <span class="text-info"><%= user.email %></span></p>
-                        <small class="text-muted">Member since: <%= new Date(user.iat*1000).toLocaleDateString() %></small>
-                    </div>
+                </div>
+            </div>
+
+            <!-- Posts Section -->
+            <div class="card border-0">
+                <div class="card-body">
+                    <h2 class="card-title fw-bold mb-4"> My Posts</h2>
+
+                    <% if (blogs && blogs.length> 0) { %>
+                        <div class="row g-4">
+                            <% blogs.forEach(blog=> { %>
+                                <div class="col-md-4 mb-4">
+                                    <div class="card h-100">
+                                        <% if (blog.coverImageUrl) { %>
+                                            <img src="<%= blog.coverImageUrl %>" class="card-img-top"
+                                                alt="<%= blog.title %>" style="height: 180px; object-fit: cover;">
+                                            <% } else { %>
+                                                <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center"
+                                                    style="height: 180px;">
+                                                    <span class="text-white">No Image</span>
+                                                </div>
+                                                <% } %>
+                                                    <div class="card-body">
+                                                        <h5 class="card-title">
+                                                            <%= blog.title %>
+                                                        </h5>
+                                                        <p class="card-text text-muted">
+                                                            <%= blog.body ? blog.body.substring(0, 100) + '...' : '' %>
+                                                        </p>
+                                                    </div>
+                                                    <div class="card-footer">
+                                                        <small class="text-muted">
+                                                            <%= new Date(blog.createdAt).toLocaleDateString() %>
+                                                        </small>
+                                                        <div class="float-end d-flex gap-2">
+                                                            <div class="d-inline" id="delete-container-<%= blog._id %>">
+                                                                <button type="button" class="btn btn-danger btn-sm"
+                                                                    onclick="showConfirm('<%= blog._id %>')">Delete</button>
+                                                            </div>
+                                                            <div class="d-none" id="confirm-container-<%= blog._id %>">
+                                                                <span class="text-danger small me-1">Sure?</span>
+                                                                <form action="/blog/delete/<%= blog._id %>"
+                                                                    method="POST" class="d-inline">
+                                                                    <button type="submit"
+                                                                        class="btn btn-danger btn-sm">Yes</button>
+                                                                </form>
+                                                                <button type="button" class="btn btn-secondary btn-sm"
+                                                                    onclick="hideConfirm('<%= blog._id %>')">No</button>
+                                                            </div>
+                                                            <a href="/blog/<%= blog._id %>"
+                                                                class="btn btn-primary btn-sm">Read More</a>
+                                                        </div>
+                                                    </div>
+                                    </div>
+                                </div>
+                                <% }) %>
+                        </div>
+                        <% } else { %>
+                            <div class="col-12 text-center py-5">
+                                <h4>No blogs yet</h4>
+                                <p class="text-muted">Be the first to create a blog!</p>
+                                <a href="/blog/add-new" class="btn btn-primary">Create Blog</a>
+                            </div>
+                            <% } %>
                 </div>
             </div>
         </div>
 
-        <!-- Posts Section -->
-        <div class="card border-0">
-            <div class="card-body">
-                <h2 class="card-title fw-bold mb-4"> My Posts</h2>
-                
-                <% if (blogs && blogs.length > 0) { %>
-                    <div class="row g-4">
-                        <% blogs.forEach(blog=> { %>
-                            <div class="col-md-4 mb-4">
-                              <div class="card h-100">
-                                <% if (blog.coverImageUrl) { %>
-                                  <img src="<%= blog.coverImageUrl %>" class="card-img-top" alt="<%= blog.title %>" style="height: 180px; object-fit: cover;">
-                                <% } else { %>
-                                  <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center" style="height: 180px;">
-                                    <span class="text-white">No Image</span>
-                                  </div>
-                                <% } %>
-                                <div class="card-body">
-                                  <h5 class="card-title"><%= blog.title %></h5>
-                                  <p class="card-text text-muted"><%= blog.body ? blog.body.substring(0, 100) + '...' : '' %></p>
-                                </div>
-                                <div class="card-footer">
-                                  <small class="text-muted"><%= new Date(blog.createdAt).toLocaleDateString() %></small>
-                                  <a href="/blog/<%= blog._id %>" class="btn btn-primary btn-sm float-end">Read More</a>
-                                </div>
-                              </div>
-                            </div>
-                        <% }) %>
-                    </div>
-                <% } else { %>
-                    <div class="col-12 text-center py-5">
-                        <h4>No blogs yet</h4>
-                        <p class="text-muted">Be the first to create a blog!</p>
-                        <a href="/blog/add-new" class="btn btn-primary">Create Blog</a>
-                    </div>
-                <% } %>
-            </div>
-        </div>
-    </div>
+        <script>
+            const profileImage = document.querySelector('.profile-image');
+            const fileInput = document.getElementById('profile-image-input');
 
-    <script>
-        const profileImage = document.querySelector('.profile-image');
-        const fileInput = document.getElementById('profile-image-input');
+            // Click image to open file input
+            profileImage.addEventListener('click', () => {
+                fileInput.click();
+            });
 
-        // Click image to open file input
-        profileImage.addEventListener('click', () => {
-            fileInput.click();
-        });
+            // Handle file selection
+            fileInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
 
-        // Handle file selection
-        fileInput.addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            // Validate file is an image
-            if (!file.type.startsWith('image/')) {
-                alert('Please select an image file');
-                return;
-            }
-
-            if(file.size > 5 * 1024 * 1024) {
-                alert('File size should be less than 5MB');
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('profileImage', file);
-
-            try {
-                const response = await fetch('/user/upload-profile-image', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const data = await response.json();
-
-                console.log("response",response);
-
-                if (response.ok) {
-                    // Update the image src
-                    profileImage.src = data.profileImageURL;
-                    alert('Profile image updated successfully!');
-                } else {
-                    alert(data.error || 'Failed to upload image');
+                // Validate file is an image
+                if (!file.type.startsWith('image/')) {
+                    alert('Please select an image file');
+                    return;
                 }
-            } catch (error) {
-                console.error('Error uploading image:', error);
-                alert('Error uploading image');
+
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('File size should be less than 5MB');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('profileImage', file);
+
+                try {
+                    const response = await fetch('/user/upload-profile-image', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const data = await response.json();
+
+                    console.log("response", response);
+
+                    if (response.ok) {
+                        // Update the image src
+                        profileImage.src = data.profileImageURL;
+                        alert('Profile image updated successfully!');
+                    } else {
+                        alert(data.error || 'Failed to upload image');
+                    }
+                } catch (error) {
+                    console.error('Error uploading image:', error);
+                    alert('Error uploading image');
+                }
+
+                // Reset file input
+                fileInput.value = '';
+            });
+
+            // Delete confirmation functions
+            function showConfirm(blogId) {
+                document.getElementById(`delete-container-${blogId}`).classList.add('d-none');
+                document.getElementById(`delete-container-${blogId}`).classList.remove('d-inline');
+                document.getElementById(`confirm-container-${blogId}`).classList.remove('d-none');
+                document.getElementById(`confirm-container-${blogId}`).classList.add('d-inline');
             }
 
-            // Reset file input
-            fileInput.value = '';
-        });
-    </script>
+            function hideConfirm(blogId) {
+                document.getElementById(`confirm-container-${blogId}`).classList.add('d-none');
+                document.getElementById(`confirm-container-${blogId}`).classList.remove('d-inline');
+                document.getElementById(`delete-container-${blogId}`).classList.remove('d-none');
+                document.getElementById(`delete-container-${blogId}`).classList.add('d-inline');
+            }
+        </script>
 
-    <%- include('./partials/script') %>
+        <%- include('./partials/script') %>
 </body>
+
 </html>
