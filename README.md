@@ -9,6 +9,9 @@ A full-stack blogging platform built with Node.js, Express, and MongoDB. Users c
 - **Browse feed** — Homepage shows all blogs sorted by newest first
 - **View single blog** — Click a post to read the full content and see author info
 - **Image uploads** — Cover images uploaded to Cloudinary and served via CDN
+- **Comments** — Post and view comments on each blog post
+- **User Profiles** — View user information and their blog posts
+- **Password Reset** — Basic implementation for password recovery
 - **GitHub Integration** — Quick access to the repository via the navigation bar
 
 ## Tech Stack
@@ -21,6 +24,7 @@ A full-stack blogging platform built with Node.js, Express, and MongoDB. Users c
 - **Auth:** JWT + bcrypt
 - **File uploads:** Multer (memory storage)
 - **Image hosting:** Cloudinary
+- **In-memory Database:** `mongodb-memory-server` (for easy development)
 
 ## Prerequisites
 
@@ -59,7 +63,7 @@ Create a `.env` file in the project root (same folder as `package.json`):
 
 ```env
 PORT=3000
-MONGO_URI=mongodb://localhost:27017/blogging-app
+MONGO_URI=mongodb://localhost:27017/blogging-app # Optional: defaults to In-Memory Mongo if not provided
 SECRET_KEY=your-super-secret-jwt-key-change-in-production
 CLOUDINARY_CLOUD_NAME=your-cloudinary-cloud-name
 CLOUDINARY_API_KEY=your-cloudinary-api-key
@@ -70,6 +74,7 @@ CLOUDINARY_API_SECRET=your-cloudinary-api-secret
 - **`MONGO_URI`** — MongoDB connection string.
   - Local: `mongodb://localhost:27017/blogging-app`
   - Atlas: `mongodb+srv://<user>:<password>@<cluster>.mongodb.net/blogging-app?retryWrites=true&w=majority`
+  - **Auto-fallback:** If left empty, the app will automatically start an in-memory MongoDB using `mongodb-memory-server`.
 - **`SECRET_KEY`** — Secret used to sign JWT tokens. Use a long, random string in production.
 - **`CLOUDINARY_CLOUD_NAME`** — Your Cloudinary cloud name. Get this from your [Cloudinary Dashboard](https://console.cloudinary.com/).
 - **`CLOUDINARY_API_KEY`** — Your Cloudinary API key. Get this from your [Cloudinary Dashboard](https://console.cloudinary.com/).
@@ -110,6 +115,7 @@ blogging-application/
 │   └── auth.js            # JWT cookie auth & route protection
 ├── models/
 │   ├── blog.js            # Blog post schema
+│   ├── comment.js         # Comment schema
 │   └── user.js            # User schema
 ├── public/
 │   └── image/             # Static images (e.g. default avatar)
@@ -121,8 +127,10 @@ blogging-application/
 ├── views/                 # EJS templates
 │   ├── addBlogs.ejs
 │   ├── blog.ejs
+│   ├── forgetPass.ejs
 │   ├── homepage.ejs
 │   ├── login.ejs
+│   ├── profile.ejs
 │   ├── signup.ejs
 │   └── partials/
 ├── .env                   # Your env vars (create this, not in git)
@@ -182,4 +190,4 @@ git push origin feature/amazing-feature
 Go to the original repository on GitHub and click "Compare & pull request". Provide a clear description of your changes.
 
 ### Reporting Issues
-If you find a bug or have a feature request, please open an issue in the [Issues](https://github.com/YOUR_USERNAME/blogging-application/issues) tab.
+If you find a bug or have a feature request, please open an issue in the [Issues](https://github.com/divyam-jha123/blogging-application/issues) tab.
