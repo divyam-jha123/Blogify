@@ -6,13 +6,14 @@
     <title>Blogify</title>
 
     <%- include('./partials/head') %>
+    <%- include('./partials/prose') %>
   </head>
   <body>
     <%- include('./partials/nav') %>
 
     <div class="container mt-5">
       <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-7">
+        <div class="col-12 col-xl-11">
           <div class="card shadow-sm border-0">
             <div class="card-body p-4">
               <h4 class="mb-4 text-center">Create New Post</h4>
@@ -45,18 +46,23 @@
                   />
                 </div>
 
-                <!-- Content -->
-                <div class="form-floating mb-3">
-                  <textarea
-                    name="content"
-                    class="form-control"
-                    placeholder="Write your post..."
-                    id="floatingTextarea2"
-                    style="height: 120px"
-                    required
-                  ></textarea>
-                  <label name ="body" for="floatingTextarea2">Write content...</label>
+                <!-- Series -->
+                <div class="mb-3">
+                  <label for="series" class="form-label">Series</label>
+                  <select name="series" id="series" class="form-select">
+                    <option value="">&mdash; No series &mdash;</option>
+                    <% seriesList.forEach(series => { %>
+                      <option value="<%= series._id %>"><%= series.title %></option>
+                    <% }) %>
+                  </select>
+                  <div class="form-text">
+                    Adds this post to the end of the series.
+                    <a href="/series/new">Create a new series</a>
+                  </div>
                 </div>
+
+                <!-- Content: Markdown writing canvas -->
+                <%- include('./partials/editor', { initialBody: '' }) %>
 
                 <!-- Button -->
                 <div class="d-grid">
