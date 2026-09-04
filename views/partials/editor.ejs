@@ -1,0 +1,170 @@
+<%
+    // Writing canvas: Markdown source on the left, live preview on the right.
+    // `initialBody` is the existing post body when editing, '' when creating.
+    const initialBody = locals.initialBody || '';
+%>
+
+    <style>
+        .canvas-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            align-items: stretch;
+        }
+
+        /* Below lg the two panes would each be too narrow to write in, so they
+           become tabs instead and only one is shown at a time. */
+        @media (max-width: 991.98px) {
+            .canvas-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .canvas-grid.show-write .canvas-pane-preview,
+            .canvas-grid.show-preview .canvas-pane-write {
+                display: none;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .canvas-tabs {
+                display: none;
+            }
+        }
+
+        .canvas-pane {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .canvas-label {
+            font-size: .75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            color: #6b7280;
+            margin-bottom: .375rem;
+        }
+
+        #canvasSource {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: .9rem;
+            line-height: 1.6;
+            min-height: 60vh;
+            resize: vertical;
+            tab-size: 2;
+        }
+
+        #canvasPreview {
+            min-height: 60vh;
+            overflow-y: auto;
+            background: #fff;
+            border: 1px solid var(--bs-border-color);
+            border-radius: .375rem;
+            padding: 1rem 1.25rem;
+        }
+
+        #canvasPreview:empty::after {
+            content: 'Nothing to preview yet.';
+            color: #9ca3af;
+        }
+    </style>
+
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+        <label for="canvasSource" class="form-label mb-0">Content</label>
+        <div class="d-flex align-items-center gap-2">
+            <span class="text-muted small" id="canvasCount"></span>
+            <div class="btn-group btn-group-sm canvas-tabs" role="group">
+                <button type="button" class="btn btn-outline-secondary active" id="canvasTabWrite">Write</button>
+                <button type="button" class="btn btn-outline-secondary" id="canvasTabPreview">Preview</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="canvas-grid show-write mb-2" id="canvasGrid">
+        <div class="canvas-pane canvas-pane-write">
+            <div class="canvas-label">Markdown</div>
+            <textarea name="content" id="canvasSource" class="form-control flex-grow-1"
+                placeholder="# Your title&#10;&#10;Write in Markdown. Use ## for sections, *italics*, **bold**, and - for lists."
+                required><%= initialBody %></textarea>
+        </div>
+
+        <div class="canvas-pane canvas-pane-preview">
+            <div class="canvas-label">Preview</div>
+            <div id="canvasPreview" class="blog-content flex-grow-1"></div>
+        </div>
+    </div>
+
+    <div class="form-text mb-4">
+        Markdown supported: <code># Heading</code>, <code>**bold**</code>, <code>*italic*</code>,
+        <code>[link](url)</code>, <code>&gt; quote</code>, <code>- list</code>.
+    </div>
+
+    <!-- Preview only. The server re-renders and sanitizes this Markdown on read,
+         so what readers see never depends on anything that happens in this page.
+         marked is pinned to the same version as the server dependency so the
+         preview and the published post agree. -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/18.0.11/lib/marked.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.4.14/purify.min.js"></script>
+    <script>
+        (function () {
+            var source = document.getElementById('canvasSource');
+            var preview = document.getElementById('canvasPreview');
+            var count = document.getElementById('canvasCount');
+            var grid = document.getElementById('canvasGrid');
+            var tabWrite = document.getElementById('canvasTabWrite');
+            var tabPreview = document.getElementById('canvasTabPreview');
+
+            var canRender = typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined';
+            if (canRender) {
+                marked.setOptions({ gfm: true, breaks: true });
+            }
+
+            function words(text) {
+                var trimmed = text.trim();
+                return trimmed ? trimmed.split(/\s+/).length : 0;
+            }
+
+            function render() {
+                count.textContent = words(source.value) + ' words';
+
+                if (!canRender) {
+                    // CDN blocked or offline: the preview is the only casualty.
+                    preview.textContent = source.value;
+                    return;
+                }
+
+                preview.innerHTML = DOMPurify.sanitize(marked.parse(source.value));
+            }
+
+            // Typing is cheap to re-render, but debounce so long posts stay smooth.
+            var timer;
+            source.addEventListener('input', function () {
+                clearTimeout(timer);
+                timer = setTimeout(render, 120);
+            });
+
+            function show(pane) {
+                grid.classList.toggle('show-write', pane === 'write');
+                grid.classList.toggle('show-preview', pane === 'preview');
+                tabWrite.classList.toggle('active', pane === 'write');
+                tabPreview.classList.toggle('active', pane === 'preview');
+            }
+
+            tabWrite.addEventListener('click', function () { show('write'); });
+            tabPreview.addEventListener('click', function () { show('preview'); });
+
+            // Tab should indent, not jump to the next field, while writing.
+            source.addEventListener('keydown', function (e) {
+                if (e.key !== 'Tab') return;
+                e.preventDefault();
+                var start = source.selectionStart;
+                var end = source.selectionEnd;
+                source.value = source.value.slice(0, start) + '  ' + source.value.slice(end);
+                source.selectionStart = source.selectionEnd = start + 2;
+                render();
+            });
+
+            render();
+        })();
+    </script>

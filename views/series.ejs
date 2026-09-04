@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+        <%= series.title %> - Blogify
+    </title>
+
+    <%- include('./partials/head') %>
+</head>
+
+<body>
+    <%- include('./partials/nav') %>
+
+        <%
+            // req.user._id is a string from the JWT payload.
+            const isOwner = locals.user && series.createdBy
+                && (user.role === 'ADMIN' || series.createdBy._id.toString() === user._id);
+        %>
+
+            <div class="container my-5">
+                <div class="row justify-content-center">
+                    <div class="col-lg-9">
+
+                        <a href="/series" class="text-decoration-none small">&larr; All series</a>
+
+                        <div class="d-flex flex-wrap align-items-start justify-content-between gap-3 mt-2 mb-4 pb-3
+                            border-bottom">
+                            <div>
+                                <h1 class="display-6 fw-bold mb-2">
+                                    <%= series.title %>
+                                </h1>
+                                <% if (series.description) { %>
+                                    <p class="text-muted mb-2">
+                                        <%= series.description %>
+                                    </p>
+                                    <% } %>
+                                        <div class="text-muted small d-flex align-items-center gap-2">
+                                            <% if (series.createdBy) { %>
+                                                <img src="<%= series.createdBy.profileImageURL %>" width="24"
+                                                    height="24" class="rounded-circle" alt="">
+                                                <span>
+                                                    <%= series.createdBy.userName %>
+                                                </span>
+                                                <span>&middot;</span>
+                                                <% } %>
+                                                    <span>
+                                                        <%= parts.length %> part<%= parts.length === 1 ? '' : 's' %>
+                                                    </span>
+                                        </div>
+                            </div>
+
+                            <% if (isOwner) { %>
+                                <div class="d-flex gap-2">
+                                    <a href="/series/<%= series.slug %>/edit"
+                                        class="btn btn-sm btn-outline-secondary">Edit</a>
+
+                                    <!-- Inline confirm, same pattern as profile.ejs -->
+                                    <button class="btn btn-sm btn-outline-danger" id="deleteBtn"
+                                        onclick="showConfirm()">Delete</button>
+                                    <span id="confirmBox" class="d-none align-items-center gap-2">
+                                        <span class="small text-muted">Delete this series?</span>
+                                        <form action="/series/<%= series.slug %>/delete" method="POST"
+                                            class="d-inline">
+                                            <button type="submit" class="btn btn-sm btn-danger">Yes</button>
+                                        </form>
+                                        <button class="btn btn-sm btn-secondary" onclick="hideConfirm()">No</button>
+                                    </span>
+                                </div>
+                                <% } %>
+                        </div>
+
+                        <% if (isOwner) { %>
+                            <p class="text-muted small">
+                                Deleting a series does not delete its posts &mdash; they simply leave the series.
+                            </p>
+                            <% } %>
+
+                                <% if (parts.length === 0) { %>
+                                    <div class="text-center text-muted py-5 border rounded-3">
+                                        <p class="mb-3">No posts in this series yet.</p>
+                                        <% if (isOwner) { %>
+                                            <a href="/blog/add-new" class="btn btn-outline-primary">Write the first
+                                                part</a>
+                                            <% } %>
+                                    </div>
+                                    <% } else { %>
+                                        <div class="list-group">
+                                            <% parts.forEach((part, i)=> { %>
+                                                <a href="/blog/<%= part._id %>"
+                                                    class="list-group-item list-group-item-action py-3">
+                                                    <div class="d-flex align-items-center gap-3">
+                                                        <span class="badge text-bg-light border">Part <%= i + 1 %>
+                                                        </span>
+                                                        <div class="flex-grow-1">
+                                                            <div class="fw-semibold">
+                                                                <%= part.title %>
+                                                            </div>
+                                                            <div class="text-muted small">
+                                                                <%= new Date(part.createdAt).toLocaleDateString('en-US',
+                                                                    { year: 'numeric' , month: 'long' , day: 'numeric'
+                                                                    }) %>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                                <% }) %>
+                                        </div>
+                                        <% } %>
+
+                    </div>
+                </div>
+            </div>
+
+            <%- include('./partials/script') %>
+
+                <% if (isOwner) { %>
+                    <script>
+                        function showConfirm() {
+                            document.getElementById('deleteBtn').classList.add('d-none');
+                            document.getElementById('confirmBox').classList.remove('d-none');
+                            document.getElementById('confirmBox').classList.add('d-inline-flex');
+                        }
+
+                        function hideConfirm() {
+                            document.getElementById('confirmBox').classList.add('d-none');
+                            document.getElementById('confirmBox').classList.remove('d-inline-flex');
+                            document.getElementById('deleteBtn').classList.remove('d-none');
+                        }
+                    </script>
+                    <% } %>
+</body>
+
+</html>

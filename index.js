@@ -8,6 +8,7 @@ const { verifyUser } = require('./service/authentication');
 
 const Blog = require('./models/blog');
 
+const { renderMarkdown, markdownExcerpt } = require('./service/markdown');
 const connectDb = require('./db/connection');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 
@@ -16,7 +17,13 @@ const port = process.env.PORT;
 const userRoute = require('./routes/user');
 const blogsRoute = require('./routes/blog');
 const apiRoute = require('./routes/api');
+const seriesRoute = require('./routes/series');
 
+
+// Post bodies are Markdown; views render them through these rather than each
+// route re-deriving the HTML.
+app.locals.renderMarkdown = renderMarkdown;
+app.locals.markdownExcerpt = markdownExcerpt;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -33,7 +40,7 @@ app.get('/', async (req, res) => {
         return res.redirect('/user/signup');
     }
 
-    const blogs = await Blog.find({}).sort({ createdAt: -1 });
+    const blogs = await Blog.find({}).sort({ createdAt: -1 }).populate('series', 'title slug');
 
     return res.render('homepage', {
         user: req.user,
@@ -44,6 +51,7 @@ app.get('/', async (req, res) => {
 app.use('/user', userRoute)
 app.use('/blog', blogsRoute);
 app.use('/api', apiRoute);
+app.use('/series', seriesRoute);
 
 
 

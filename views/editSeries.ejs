@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Series - Blogify</title>
+
+    <%- include('./partials/head') %>
+</head>
+
+<body>
+    <%- include('./partials/nav') %>
+
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-7">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body p-4">
+                            <h4 class="mb-4 text-center">Edit Series</h4>
+
+                            <form action="/series/<%= series.slug %>/edit" method="post">
+
+                                <div class="mb-3">
+                                    <label for="title" class="form-label">Title</label>
+                                    <input type="text" class="form-control" name="title" id="title"
+                                        placeholder="e.g. Building My Vorkium Startup" value="<%= series.title %>" required />
+                                </div>
+
+                                <div class="form-floating mb-3">
+                                    <textarea name="description" class="form-control"
+                                        placeholder="What is this series about?" id="seriesDescription"
+                                        style="height: 120px"><%= series.description ? series.description : '' %></textarea>
+                                    <label for="seriesDescription">Description (optional)</label>
+                                </div>
+
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary">Update Series</button>
+                                    <a href="/series/<%= series.slug %>" class="btn btn-outline-secondary">Cancel</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <%- include('./partials/script') %>
+</body>
+
+</html>
