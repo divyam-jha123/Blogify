@@ -12,6 +12,9 @@
   "engines": {
     "node": "22.x"
   },
+  "overrides": {
+    "htmlparser2": "^10.1.0"
+  },
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.9.0",
