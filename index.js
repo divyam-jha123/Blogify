@@ -8,7 +8,7 @@ const { verifyUser } = require('./service/authentication');
 
 const Blog = require('./models/blog');
 
-const { renderMarkdown, markdownExcerpt } = require('./service/markdown');
+const { renderMarkdown, markdownExcerpt, markdownReady } = require('./service/markdown');
 const connectDb = require('./db/connection');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 
@@ -67,6 +67,10 @@ const start = async () => {
         }
 
         await connectDb(mongoUri);
+
+        // marked loads asynchronously; settle it before the first request so a
+        // post never renders as unformatted plain text.
+        await markdownReady;
 
         app.listen(port, () => {
             console.log(`server is running at port: ${port}`);

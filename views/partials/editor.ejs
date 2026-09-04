@@ -1,5 +1,5 @@
 <%
-    // Writing canvas: Markdown source on the left, live preview on the right.
+    // Writing canvas: one pane at a time, switched by the Write/Preview tabs.
     // `initialBody` is the existing post body when editing, '' when creating.
     const initialBody = locals.initialBody || '';
 %>
@@ -7,43 +7,21 @@
     <style>
         .canvas-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr;
             gap: 1rem;
             align-items: stretch;
         }
 
-        /* Below lg the two panes would each be too narrow to write in, so they
-           become tabs instead and only one is shown at a time. */
-        @media (max-width: 991.98px) {
-            .canvas-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .canvas-grid.show-write .canvas-pane-preview,
-            .canvas-grid.show-preview .canvas-pane-write {
-                display: none;
-            }
-        }
-
-        @media (min-width: 992px) {
-            .canvas-tabs {
-                display: none;
-            }
+        /* Only the pane named by the active tab is shown, at every width. */
+        .canvas-grid.show-write .canvas-pane-preview,
+        .canvas-grid.show-preview .canvas-pane-write {
+            display: none;
         }
 
         .canvas-pane {
             display: flex;
             flex-direction: column;
             min-width: 0;
-        }
-
-        .canvas-label {
-            font-size: .75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: .04em;
-            color: #6b7280;
-            margin-bottom: .375rem;
         }
 
         #canvasSource {
@@ -83,14 +61,12 @@
 
     <div class="canvas-grid show-write mb-2" id="canvasGrid">
         <div class="canvas-pane canvas-pane-write">
-            <div class="canvas-label">Markdown</div>
             <textarea name="content" id="canvasSource" class="form-control flex-grow-1"
                 placeholder="# Your title&#10;&#10;Write in Markdown. Use ## for sections, *italics*, **bold**, and - for lists."
                 required><%= initialBody %></textarea>
         </div>
 
         <div class="canvas-pane canvas-pane-preview">
-            <div class="canvas-label">Preview</div>
             <div id="canvasPreview" class="blog-content flex-grow-1"></div>
         </div>
     </div>
@@ -125,8 +101,12 @@
                 return trimmed ? trimmed.split(/\s+/).length : 0;
             }
 
-            function render() {
+            function updateCount() {
                 count.textContent = words(source.value) + ' words';
+            }
+
+            function render() {
+                updateCount();
 
                 if (!canRender) {
                     // CDN blocked or offline: the preview is the only casualty.
@@ -137,22 +117,30 @@
                 preview.innerHTML = DOMPurify.sanitize(marked.parse(source.value));
             }
 
-            // Typing is cheap to re-render, but debounce so long posts stay smooth.
-            var timer;
-            source.addEventListener('input', function () {
-                clearTimeout(timer);
-                timer = setTimeout(render, 120);
-            });
+            // The preview is off screen while writing, so typing only keeps the
+            // word count honest; the Markdown is converted on the way into it.
+            source.addEventListener('input', updateCount);
 
             function show(pane) {
                 grid.classList.toggle('show-write', pane === 'write');
                 grid.classList.toggle('show-preview', pane === 'preview');
                 tabWrite.classList.toggle('active', pane === 'write');
                 tabPreview.classList.toggle('active', pane === 'preview');
+                tabWrite.setAttribute('aria-selected', String(pane === 'write'));
+                tabPreview.setAttribute('aria-selected', String(pane === 'preview'));
+
+                if (pane === 'preview') {
+                    render();
+                }
             }
 
             tabWrite.addEventListener('click', function () { show('write'); });
             tabPreview.addEventListener('click', function () { show('preview'); });
+
+            // A required field hidden by display:none cannot be focused, so the
+            // browser would silently refuse to submit an empty post from the
+            // Preview tab. Swap back to Write so the message has somewhere to go.
+            source.addEventListener('invalid', function () { show('write'); });
 
             // Tab should indent, not jump to the next field, while writing.
             source.addEventListener('keydown', function (e) {
@@ -162,9 +150,9 @@
                 var end = source.selectionEnd;
                 source.value = source.value.slice(0, start) + '  ' + source.value.slice(end);
                 source.selectionStart = source.selectionEnd = start + 2;
-                render();
+                updateCount();
             });
 
-            render();
+            updateCount();
         })();
     </script>
