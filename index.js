@@ -15,6 +15,7 @@ const port = process.env.PORT;
 
 const userRoute = require('./routes/user');
 const blogsRoute = require('./routes/blog');
+const apiRoute = require('./routes/api');
 
 
 app.use(express.json());
@@ -42,6 +43,7 @@ app.get('/', async (req, res) => {
 
 app.use('/user', userRoute)
 app.use('/blog', blogsRoute);
+app.use('/api', apiRoute);
 
 
 
