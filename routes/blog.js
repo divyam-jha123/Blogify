@@ -84,6 +84,64 @@ router.post('/', restrictToLoggedinUserOnly, upload.single('coverImageUrl'), asy
   }
 });
 
+router.get('/edit/:id', restrictToLoggedinUserOnly, async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.id);
+    if (!blog) {
+      return res.status(404).send('Blog not found');
+    }
+
+    if (req.user.role !== 'ADMIN' && blog.createdBy.toString() !== req.user._id) {
+      return res.status(401).send('Unauthorized');
+    }
+
+    return res.render('editBlogs', {
+      user: req.user,
+      blog,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send('Internal Server Error');
+  }
+});
+
+router.post('/edit/:id', restrictToLoggedinUserOnly, upload.single('coverImageUrl'), async (req, res) => {
+  try {
+    const blog = await Blog.findById(req.params.id);
+    if (!blog) {
+      return res.status(404).send('Blog not found');
+    }
+
+    if (req.user.role !== 'ADMIN' && blog.createdBy.toString() !== req.user._id) {
+      return res.status(401).send('Unauthorized');
+    }
+
+    const { title, content } = req.body;
+
+    blog.title = title;
+    blog.body = content;
+
+    // Replace the cover image only if a new file was uploaded
+    if (req.file) {
+      const base64Image = `data:${req.file.mimetype};base64,${req.file.buffer.toString('base64')}`;
+
+      const uploadResult = await cloudinary.uploader.upload(base64Image, {
+        folder: 'blog-images',
+        resource_type: 'auto',
+      });
+
+      blog.coverImageUrl = uploadResult.secure_url;
+    }
+
+    await blog.save();
+
+    return res.redirect(`/blog/${blog._id}`);
+  } catch (error) {
+    console.error('Error updating blog:', error);
+    return res.status(500).send('Error updating blog. Please try again.');
+  }
+});
+
 router.post('/delete/:id', restrictToLoggedinUserOnly, async (req, res) => {
   try {
     const blog = await Blog.findById(req.params.id);
